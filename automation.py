@@ -923,6 +923,8 @@ class TrialOrdersAutomation:
 
             print(f"  Searching for existing case with party name: {party_name}")
 
+            matches = []
+
             # Search through all case folders
             for client_folder in self.sharepoint_client.cases_folder.iterdir():
                 if not client_folder.is_dir():
@@ -934,9 +936,6 @@ class TrialOrdersAutomation:
 
                     # Check if party name appears in folder name
                     if party_upper in matter_folder.name.upper():
-                        print(f"  Found matching case: {client_folder.name}\\{matter_folder.name}")
-
-                        # Extract info from folder names
                         client_num = client_folder.name
                         matter_name = matter_folder.name
 
@@ -944,16 +943,26 @@ class TrialOrdersAutomation:
                         if " - " in matter_name:
                             style = matter_name.split(" - ", 1)[1]
 
-                        return {
+                        matches.append({
                             "Client": client_num,
                             "Matter": matter_name,
                             "Style": style,
-                            "CaseNumber": None,  # Don't have case number yet
+                            "CaseNumber": None,
                             "FolderPath": str(matter_folder),
                             "RelativePath": f"{client_num}\\{matter_name}"
-                        }
+                        })
 
-            return None
+            # Only return if exactly one match found
+            if len(matches) == 0:
+                print(f"  No matching cases found")
+                return None
+            elif len(matches) == 1:
+                match = matches[0]
+                print(f"  Found matching case: {match['RelativePath']}")
+                return match
+            else:
+                print(f"  Found {len(matches)} matching cases - ambiguous, leaving uncategorized")
+                return None
 
         except Exception as e:
             print(f"  Error searching by party name: {e}")
@@ -1065,20 +1074,26 @@ class TrialOrdersAutomation:
         return None
 
     def extract_outlook_attachments(self, email_id: str) -> List[Tuple[str, bytes]]:
-        """Extract PDF attachments directly from Outlook email"""
+        """Extract PDF attachments directly from Outlook email, including PDFs inside ZIP files"""
         attachments = []
         try:
+            import tempfile
+            import os
+            import zipfile
+
             msg = self.email_client.namespace.GetItemFromID(email_id)
             if hasattr(msg, 'Attachments') and msg.Attachments.Count > 0:
                 for attachment in msg.Attachments:
-                    if hasattr(attachment, 'FileName') and attachment.FileName.lower().endswith('.pdf'):
-                        # Read attachment content
-                        title = attachment.FileName
-                        if title.lower().endswith('.pdf'):
-                            title = title[:-4]
+                    if not hasattr(attachment, 'FileName'):
+                        continue
+
+                    filename = attachment.FileName
+
+                    # Handle PDF attachments
+                    if filename.lower().endswith('.pdf'):
+                        title = filename[:-4] if filename.lower().endswith('.pdf') else filename
 
                         # Save to temp file to read content
-                        import tempfile
                         with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp:
                             tmp_path = tmp.name
                             attachment.SaveAsFile(tmp_path)
@@ -1087,12 +1102,35 @@ class TrialOrdersAutomation:
                         with open(tmp_path, 'rb') as f:
                             content = f.read()
 
-                        # Delete temp file
-                        import os
                         os.unlink(tmp_path)
-
                         attachments.append((title, content))
-                        print(f"    Found attachment: {attachment.FileName}")
+                        print(f"    Found PDF attachment: {filename}")
+
+                    # Handle ZIP attachments - extract PDFs inside
+                    elif filename.lower().endswith('.zip'):
+                        print(f"    Found ZIP attachment: {filename} - extracting PDFs...")
+
+                        # Save ZIP to temp file
+                        with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as tmp:
+                            tmp_zip_path = tmp.name
+                            attachment.SaveAsFile(tmp_zip_path)
+
+                        # Extract PDFs from ZIP
+                        try:
+                            with zipfile.ZipFile(tmp_zip_path, 'r') as zip_ref:
+                                for zip_info in zip_ref.namelist():
+                                    if zip_info.lower().endswith('.pdf'):
+                                        pdf_content = zip_ref.read(zip_info)
+                                        # Use just the filename without path
+                                        pdf_name = os.path.basename(zip_info)
+                                        title = pdf_name[:-4] if pdf_name.lower().endswith('.pdf') else pdf_name
+                                        attachments.append((title, pdf_content))
+                                        print(f"      Extracted from ZIP: {pdf_name}")
+                        except Exception as e:
+                            print(f"      Error extracting ZIP: {e}")
+
+                        os.unlink(tmp_zip_path)
+
         except Exception as e:
             print(f"    Warning: Could not extract attachments: {e}")
 
