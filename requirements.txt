@@ -1,0 +1,32 @@
+# Trial Orders Automation - Python Dependencies
+# Version 2.0 - Multi-Provider AI Support
+
+# Core utilities
+requests==2.31.0
+beautifulsoup4==4.12.3
+python-dotenv==1.0.1
+
+# httpx pinned to 0.27.x (0.28+ breaks AI library compatibility)
+httpx>=0.27.0,<0.28
+
+# Windows COM automation (uses your existing Outlook installation)
+pywin32==306
+
+# Excel file handling (for OneDrive-synced Trial Tracker)
+openpyxl==3.1.5
+
+# PDF text extraction (for regex-based date parsing)
+pdfplumber==0.11.0
+
+# AI Providers - install only what you need
+# Claude (Anthropic)
+anthropic==0.25.1
+
+# OpenAI (GPT-4o with vision)
+openai==1.12.0
+
+# Google Gemini
+google-generativeai>=0.8.0
+
+# Note: vLLM doesn't need a client library - it uses OpenAI-compatible API
+# Just point the openai client to your vLLM endpoint
