@@ -1034,6 +1034,40 @@ class TrialOrdersAutomation:
             return case_num
         return None
 
+    def extract_outlook_attachments(self, email_id: str) -> List[Tuple[str, bytes]]:
+        """Extract PDF attachments directly from Outlook email"""
+        attachments = []
+        try:
+            msg = self.email_client.namespace.GetItemFromID(email_id)
+            if hasattr(msg, 'Attachments') and msg.Attachments.Count > 0:
+                for attachment in msg.Attachments:
+                    if hasattr(attachment, 'FileName') and attachment.FileName.lower().endswith('.pdf'):
+                        # Read attachment content
+                        title = attachment.FileName
+                        if title.lower().endswith('.pdf'):
+                            title = title[:-4]
+
+                        # Save to temp file to read content
+                        import tempfile
+                        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp:
+                            tmp_path = tmp.name
+                            attachment.SaveAsFile(tmp_path)
+
+                        # Read content
+                        with open(tmp_path, 'rb') as f:
+                            content = f.read()
+
+                        # Delete temp file
+                        import os
+                        os.unlink(tmp_path)
+
+                        attachments.append((title, content))
+                        print(f"    Found attachment: {attachment.FileName}")
+        except Exception as e:
+            print(f"    Warning: Could not extract attachments: {e}")
+
+        return attachments
+
     def extract_pdf_links_from_email(self, email_body: str) -> List[Tuple[str, str]]:
         """Extract PDF download links from email HTML body"""
         soup = BeautifulSoup(email_body, 'html.parser')
@@ -1331,31 +1365,47 @@ class TrialOrdersAutomation:
 
         print(f"  Found case: {case_info.get('Client')} - {case_info.get('Matter')}")
 
-        # Extract PDF links from email
+        # Collect PDFs from both sources: download links and direct attachments
+        pdfs_to_process = []
+
+        # Source 1: Extract PDF download links from email body (court service emails)
         pdf_links = self.extract_pdf_links_from_email(body_content)
-        if not pdf_links:
-            print("  WARNING: No PDF links found in email")
+        if pdf_links:
+            print(f"  Found {len(pdf_links)} PDF link(s) in email body")
+            # Skip first link (ZIP file) and add individual PDFs
+            individual_pdfs = pdf_links[1:] if len(pdf_links) > 1 else []
+            for title, url in individual_pdfs:
+                pdfs_to_process.append(('link', title, url, None))
+
+        # Source 2: Extract direct PDF attachments from Outlook
+        print("  Checking for direct PDF attachments...")
+        attachments = self.extract_outlook_attachments(email_id)
+        if attachments:
+            print(f"  Found {len(attachments)} direct attachment(s)")
+            for title, content in attachments:
+                pdfs_to_process.append(('attachment', title, None, content))
+
+        if not pdfs_to_process:
+            print("  WARNING: No PDFs found (no links or attachments)")
             return False
 
-        print(f"  Found {len(pdf_links)} PDF(s) to download")
-
-        # Skip first link (ZIP file) and process individual PDFs only
-        individual_pdfs = pdf_links[1:] if len(pdf_links) > 1 else []
-        if not individual_pdfs:
-            print("  WARNING: No individual PDF links found (only ZIP file)")
-            return False
-
-        print(f"  Processing {len(individual_pdfs)} individual PDF(s) (skipping ZIP file)")
+        print(f"  Processing {len(pdfs_to_process)} PDF(s) total")
 
         # Process each PDF
         documents_processed = 0
-        for title, url in individual_pdfs:
+        for source_type, title, url, content in pdfs_to_process:
             print(f"\n  Processing: {title}")
-            print(f"  URL: {url}")
 
             try:
-                pdf_content = self.download_pdf(url)
-                print(f"  Downloaded ({len(pdf_content)} bytes)")
+                # Get PDF content based on source
+                if source_type == 'link':
+                    print(f"  URL: {url}")
+                    pdf_content = self.download_pdf(url)
+                    print(f"  Downloaded ({len(pdf_content)} bytes)")
+                else:  # attachment
+                    print(f"  Source: Direct attachment")
+                    pdf_content = content
+                    print(f"  Size: {len(pdf_content)} bytes")
 
                 # Extract caption info from PDF
                 caption_info = self.extract_caption_info(pdf_content)
