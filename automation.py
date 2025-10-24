@@ -143,24 +143,7 @@ class EmailClient:
                     filtered_messages = messages.Restrict(filter_str)
 
                     for msg in filtered_messages:
-                        # Check if email matches our criteria:
-                        # 1. Subject contains court document filter, OR
-                        # 2. Has PDF attachments
-                        has_court_subject = self.config.EMAIL_SUBJECT_FILTER.lower() in msg.Subject.lower()
-                        has_pdf_attachments = False
-
-                        try:
-                            if hasattr(msg, 'Attachments') and msg.Attachments.Count > 0:
-                                for attachment in msg.Attachments:
-                                    if hasattr(attachment, 'FileName') and attachment.FileName.lower().endswith('.pdf'):
-                                        has_pdf_attachments = True
-                                        break
-                        except:
-                            pass
-
-                        # Skip if doesn't match our criteria
-                        if not (has_court_subject or has_pdf_attachments):
-                            continue
+                        # Process all unread emails in Daily Mail folder
                         try:
                             # Get HTML body (preferred) or plain text
                             body = msg.HTMLBody if hasattr(msg, 'HTMLBody') else msg.Body
