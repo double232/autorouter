@@ -114,21 +114,23 @@ class EmailClient:
 
             emails = []
 
-            # Search inbox and all subfolders
-            folders_to_search = [inbox]
-
-            # Add all subfolders
-            def add_subfolders(folder):
-                try:
-                    for subfolder in folder.Folders:
+            # Only search "Daily Mail" subfolder
+            folders_to_search = []
+            try:
+                for subfolder in inbox.Folders:
+                    if subfolder.Name.lower() == "daily mail":
                         folders_to_search.append(subfolder)
-                        add_subfolders(subfolder)  # Recursive
-                except:
-                    pass
+                        print(f"Found 'Daily Mail' folder")
+                        break
 
-            add_subfolders(inbox)
+                if not folders_to_search:
+                    print("WARNING: 'Daily Mail' folder not found in Inbox")
+                    return emails
+            except Exception as e:
+                print(f"Error finding 'Daily Mail' folder: {e}")
+                return emails
 
-            print(f"Searching {len(folders_to_search)} folder(s) for unread emails...")
+            print(f"Searching Daily Mail folder for unread emails...")
 
             # Search each folder
             for folder in folders_to_search:
