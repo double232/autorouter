@@ -914,6 +914,51 @@ class TrialOrdersAutomation:
             print(f"  Warning: Could not extract caption: {e}")
             return {}
 
+    def find_case_by_party_name(self, party_name: str) -> Optional[Dict]:
+        """Search for existing case folder by party name (plaintiff or defendant)"""
+        try:
+            party_upper = party_name.upper().strip()
+            if len(party_upper) < 3:  # Too short to be reliable
+                return None
+
+            print(f"  Searching for existing case with party name: {party_name}")
+
+            # Search through all case folders
+            for client_folder in self.sharepoint_client.cases_folder.iterdir():
+                if not client_folder.is_dir():
+                    continue
+
+                for matter_folder in client_folder.iterdir():
+                    if not matter_folder.is_dir():
+                        continue
+
+                    # Check if party name appears in folder name
+                    if party_upper in matter_folder.name.upper():
+                        print(f"  Found matching case: {client_folder.name}\\{matter_folder.name}")
+
+                        # Extract info from folder names
+                        client_num = client_folder.name
+                        matter_name = matter_folder.name
+
+                        style = "Unknown"
+                        if " - " in matter_name:
+                            style = matter_name.split(" - ", 1)[1]
+
+                        return {
+                            "Client": client_num,
+                            "Matter": matter_name,
+                            "Style": style,
+                            "CaseNumber": None,  # Don't have case number yet
+                            "FolderPath": str(matter_folder),
+                            "RelativePath": f"{client_num}\\{matter_name}"
+                        }
+
+            return None
+
+        except Exception as e:
+            print(f"  Error searching by party name: {e}")
+            return None
+
     def identify_client_from_defendant(self, defendant_text: str) -> str:
         """Identify client number from defendant name"""
         defendant_upper = defendant_text.upper()
@@ -1303,14 +1348,29 @@ class TrialOrdersAutomation:
         if case_number:
             print(f"  Case Number from subject: {case_number}")
         else:
-            print("  No case number in subject - will extract from PDF captions")
+            print("  No case number in subject - will try party name matching")
 
         # Get case info from SharePoint (if we have a case number)
         case_info = None
         if case_number:
             case_info = self.sharepoint_client.get_case_by_number(case_number)
 
-        # If no case info yet, we'll extract from PDF captions later
+        # If no case info yet, try matching by party names in subject
+        if not case_info:
+            # Extract party names from subject (format: "PARTY1 v PARTY2" or "PARTY1 vs PARTY2")
+            party_match = re.search(r'([A-Z][A-Za-z\s]+?)\s+(?:v\.?s?\.?)\s+([A-Z][A-Za-z\s/]+?)(?:\s+-|\s+/|$)', subject, re.IGNORECASE)
+            if party_match:
+                plaintiff = party_match.group(1).strip()
+                defendant = party_match.group(2).strip()
+
+                # Try to find case by plaintiff name first
+                case_info = self.find_case_by_party_name(plaintiff)
+
+                # If not found, try defendant
+                if not case_info:
+                    case_info = self.find_case_by_party_name(defendant)
+
+        # If still no case info and we have a case number, try to create new row
         if not case_info and case_number:
             print(f"  WARNING: Case {case_number} not found in existing folders")
             print(f"  Attempting to identify client from defendant...")
