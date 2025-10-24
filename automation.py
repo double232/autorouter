@@ -973,7 +973,7 @@ class TrialOrdersAutomation:
         subfolder: str,
         title: str
     ) -> tuple[str, str]:
-        """
+        r"""
         Determine filing path based on available information
         Returns: (folder_path, filing_level)
 
@@ -1365,7 +1365,10 @@ class TrialOrdersAutomation:
                 print(f"  ERROR: Could not create case row")
                 return False
 
-        print(f"  Found case: {case_info.get('Client')} - {case_info.get('Matter')}")
+        if case_info:
+            print(f"  Found case: {case_info.get('Client')} - {case_info.get('Matter')}")
+        else:
+            print(f"  No case info yet - will extract from PDF captions")
 
         # Collect PDFs from both sources: download links and direct attachments
         pdfs_to_process = []

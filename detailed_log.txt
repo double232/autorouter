@@ -1,0 +1,52 @@
+Using local OneDrive folders
+   Cases: C:\Users\zucku\OneDrive - Vernis and Bowling\Litigation Operations - Cases
+   Tracker: C:\Users\zucku\OneDrive - Vernis and Bowling\Litigation Operations - Trial Tracker\Trial Tracker.xlsx
+============================================================
+Court Document Automation - Starting (AI: GEMINI)
+  - Trial Orders (UTO/CMO): Extract dates + Update Excel
+  - Other Documents: Auto-route to appropriate folders
+============================================================
+Connected to Outlook (using your existing session)
+Found 'Daily Mail' folder
+Searching Daily Mail folder for unread emails...
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+
+Found 3 unread court document emails
+
+Processing email: RIZZI v WARRIOR / SCE / ABC - Deposition Request John Morales
+  Email age: 0 days
+  No case number in subject - will extract from PDF captions
+
+ERROR: Error processing email: 'NoneType' object has no attribute 'get'
+
+Processing email: SERVICE OF COURT DOCUMENTS - CASE NO.: 2025-CA-001389
+  Email age: 0 days
+  No case number in subject - will extract from PDF captions
+
+ERROR: Error processing email: 'NoneType' object has no attribute 'get'
+
+Processing email: SERVICE OF COURT DOCUMENT CASE NUMBER 562025CA001389AXXXHC RODRIGUEZ, GABRIELLA VS STATE FARM FIRE AND CASUALTY C
+  Email age: 0 days
+  Case Number from subject: 562025CA001389AXXXHC
+  Found Excel mapping: 562025CA001389AXXXHC -> Client 220, Matter 90250221
+  Found case folder: 220\90250221 - Rodriguez
+  Found case: 220 - 90250221 - Rodriguez
+  Found 2 PDF link(s) in email body
+  Checking for direct PDF attachments...
+  Processing 1 PDF(s) total
+
+  Processing: Notice of Serving Answers to Roggs
+  URL: https://www.myflcourtaccess.com/nefdocuments/document.nefdd?nai=FkqkjZTqw3Gtfg15Pv7PQzt8M48gWcY3&ds=1
+  Downloaded (180308 bytes)
+  Document type: Pleading -> 02 Pleadings
+  Filing level: sorted -> 220\90250221 - Rodriguez\02 Pleadings
+  E-Filing date: 2025.10.24
+  Uploading to: 220\90250221 - Rodriguez\02 Pleadings\2025.10.24 - Notice of Serving Answers to Roggs.pdf
+  Saved to: C:\Users\zucku\OneDrive - Vernis and Bowling\Litigation Operations - Cases\220\90250221 - Rodriguez\02 Pleadings\2025.10.24 - Notice of Serving Answers to Roggs.pdf
+  Filed successfully
+
+============================================================
+Completed: 1/3 emails processed successfully
+============================================================
