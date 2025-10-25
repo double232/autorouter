@@ -734,8 +734,8 @@ class PDFProcessor:
             }
 
 
-class TrialOrdersAutomation:
-    """Main automation orchestrator"""
+class AutoRouter:
+    """AutoRouter - Intelligent Court Document Filing System"""
 
     def __init__(self):
         self.config = Config()
@@ -1459,9 +1459,10 @@ class TrialOrdersAutomation:
     def run(self):
         """Main run loop"""
         print("=" * 60)
-        print(f"Court Document Automation - Starting")
-        print("  - Trial Orders (UTO/CMO): Extract dates + Update Excel")
-        print("  - Other Documents: Auto-route to appropriate folders")
+        print("AutoRouter - Intelligent Court Document Filing")
+        print("  - Smart case matching & routing")
+        print("  - Multi-source document processing")
+        print("  - Tiered filing system")
         print("=" * 60)
 
         try:
@@ -1500,9 +1501,9 @@ class TrialOrdersAutomation:
 
 
 def main():
-    """Entry point"""
-    automation = TrialOrdersAutomation()
-    automation.run()
+    """AutoRouter - Entry point"""
+    router = AutoRouter()
+    router.run()
 
 
 if __name__ == "__main__":
