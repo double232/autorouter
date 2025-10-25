@@ -1,0 +1,470 @@
+Using local OneDrive folders
+   Cases: C:\Users\zucku\OneDrive - Vernis and Bowling\Litigation Operations - Cases
+   Tracker: C:\Users\zucku\OneDrive - Vernis and Bowling\Litigation Operations - Trial Tracker\Trial Tracker.xlsx
+============================================================
+Court Document Automation - Starting (AI: GEMINI)
+  - Trial Orders (UTO/CMO): Extract dates + Update Excel
+  - Other Documents: Auto-route to appropriate folders
+============================================================
+Connected to Outlook (using your existing session)
+Found 'Daily Mail' folder
+Searching Daily Mail folder for unread emails...
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+  Found email in folder: Daily Mail
+
+Found 45 unread court document emails
+
+Processing email: RE: [EXTERNAL] RE: brief
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Last call this week: add your ROI insights (+ early access)
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE:  Objection to Unilaterally Scheduled Deposition – Hernandez v. Citizens Property Insurance Corporation
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Hernandez
+  Found 2 matching cases - ambiguous, leaving uncategorized
+  Searching for existing case with party name: Citizens Property Insurance Corporation
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Re: [EXTERNAL] RE: Our File no. 0255-240323 Jay, Michael & Robin vs. Warrior Roofing Manufacturing Co., ABC Supply Co.(Claim# 09678902)
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: RIZZI v WARRIOR / SCE / ABC - Deposition Request John Morales
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: RIZZI
+  Found matching case: 255\240324 - Rizzi
+  Found case: 255 - 240324 - Rizzi
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE:  Objection to Unilaterally Scheduled Deposition – Hernandez v. Citizens Property Insurance Corporation
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Hernandez
+  Found 2 matching cases - ambiguous, leaving uncategorized
+  Searching for existing case with party name: Citizens Property Insurance Corporation
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Mediation - (BODILY INJURY) - BERHMANN, RYAN VS STURLA, MARIO, ARIANNY AND MARITZA - EDI969308 - KG FILE NO: 25-4523
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Neurosurgeon defense expert
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Meeting Forward Notification: (PRF/EAZ) Deposition of Erick Valcarcel - Our File no. 0255-240325 Landay, Larry & Adriana v. Warrior Roofing Manufacturing Co., ABC Supply Co., and MAP Construction & Design (09678902) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Meeting Forward Notification: (EAZ) Telephone Conference w/ PRF -Our File no. 0255-240325 Landay, Larry & Adriana v. Warrior Roofing Manufacturing Co., ABC Supply Co., and MAP Construction & Design (09678902) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Meeting Forward Notification: (PRF/EAZ) Deposition of Plaintiff's Expert Luis Garcia- Our File no. 272-240284 Santana, Michelle & Cristian Camilo Morales Marin vs. Citizens (001-00-440048) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Meeting Forward Notification: (EAZ) Telephone Conference with PRF- Our File no. 272-240284 Santana, Michelle & Cristian Camilo Morales Marin vs. Citizens (001-00-440048) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Meeting Forward Notification: (EAZ) Telephone Conference w/ PRF -Our File no. 0255-240325 Landay, Larry & Adriana v. Warrior Roofing Manufacturing Co., ABC Supply Co., and MAP Construction & Design (09678902) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: LANDAY, LARRY - WARRIOR ROOFING MANUFACTURING CO INC, ET AL.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Meeting Forward Notification: (PRF/EAZ) Deposition of Erick Valcarcel - Our File no. 0255-240325 Landay, Larry & Adriana v. Warrior Roofing Manufacturing Co., ABC Supply Co., and MAP Construction & Design (09678902) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Workplace Negligent Security Expert
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Your Zoom Proceeding is set! - J13672882 - Witness: Eric Trillas - Date: 11/6/2025
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Your Zoom Proceeding is set! - J13672882 - Witness: Eric Trillas - Date: 11/6/2025
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Let LCPMD Support Your 2025 Injury Cases
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE:  Objection to Unilaterally Scheduled Deposition – Hernandez v. Citizens Property Insurance Corporation
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Hernandez
+  Found 2 matching cases - ambiguous, leaving uncategorized
+  Searching for existing case with party name: Citizens Property Insurance Corporation
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Re: RIZZI v Warrior / ABC / SCE - Deposition coordination Cibotti
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: RIZZI
+  Found matching case: 255\240324 - Rizzi
+  Found case: 255 - 240324 - Rizzi
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: LANDAY, LARRY - WARRIOR ROOFING MANUFACTURING CO INC, ET AL.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: SERVICE OF COURT DOCUMENT CASE NUMBER 062025CA000277AXXXCE BOSTIAN, DEBBIE VS TAMARAC GARDENS CONDOMINIUM NO
+  Email age: 0 days
+  Case Number from subject: 062025CA000277AXXXCE
+  Found Excel mapping: 062025CA000277AXXXCE -> Client 4694, Matter None
+  WARNING: Matter folder not found in 4694 for matter None
+  Searching for existing case with party name: DEBBIE
+  No matching cases found
+  Searching for existing case with party name: TAMARAC GARDENS CONDOMINIUM NO
+  No matching cases found
+  WARNING: Case 062025CA000277AXXXCE not found in existing folders
+  Attempting to identify client from defendant...
+  Identified client: 4694
+  Creating new row in Lookup Table 2 with available info...
+  Created new row in Lookup Table 2
+  Row created - continuing with minimal case info
+  Found case: 4694 - 062025CA000277AXXXCE
+  Found 4 PDF link(s) in email body
+  Checking for direct PDF attachments...
+  Processing 3 PDF(s) total
+
+  Processing: Notice of Compliance - Bostian
+  URL: https://www.myflcourtaccess.com/nefdocuments/document.nefdd?nai=MyKmdhGIjhkEv3k1r5f9X29fAjgQxTaI&ds=1
+  Downloaded (216857 bytes)
+  Document type: Other -> 03 Discovery
+  Filing level: sorted -> 4694\062025CA000277AXXXCE - BOSTIAN\03 Discovery
+  E-Filing date: 2025.10.24
+  Uploading to: 4694\062025CA000277AXXXCE - BOSTIAN\03 Discovery\2025.10.24 - Notice of Compliance - Bostian.pdf
+  Duplicate detected (identical): 2025.10.24 - Notice of Compliance - Bostian.pdf - Skipping
+  Filed successfully
+
+  Processing: RFP to Plaintiff - Bostian
+  URL: https://www.myflcourtaccess.com/nefdocuments/document.nefdd?nai=MyKmdhGIjhkEv3k1r5f9X29fAjgQxTaI&ds=2
+  Downloaded (271765 bytes)
+  Document type: Discovery -> 03 Discovery
+  Filing level: sorted -> 4694\062025CA000277AXXXCE - BOSTIAN\03 Discovery
+  E-Filing date: 2025.10.24
+  Uploading to: 4694\062025CA000277AXXXCE - BOSTIAN\03 Discovery\2025.10.24 - RFP to Plaintiff - Bostian.pdf
+  Duplicate detected (identical): 2025.10.24 - RFP to Plaintiff - Bostian.pdf - Skipping
+  Filed successfully
+
+  Processing: Interrogaties to Plaintiff - Bostian
+  URL: https://www.myflcourtaccess.com/nefdocuments/document.nefdd?nai=MyKmdhGIjhkEv3k1r5f9X29fAjgQxTaI&ds=3
+  Downloaded (259875 bytes)
+  Document type: Other -> 03 Discovery
+  Filing level: sorted -> 4694\062025CA000277AXXXCE - BOSTIAN\03 Discovery
+  E-Filing date: 2025.10.24
+  Uploading to: 4694\062025CA000277AXXXCE - BOSTIAN\03 Discovery\2025.10.24 - Interrogaties to Plaintiff - Bostian.pdf
+  Duplicate detected (identical): 2025.10.24 - Interrogaties to Plaintiff - Bostian.pdf - Skipping
+  Filed successfully
+
+Processing email: Filing Received
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: LANDAY, LARRY - WARRIOR ROOFING MANUFACTURING CO INC, ET AL.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Processing Completed for Filing # 234407377
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: FW: Allstate has assigned you to Garcell, et al. vs. Castle Key Insurance Company
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: brief
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Filing Received
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: Warren, Keambria T. v. Wszelaki/ NJM claim 23-672237
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Processing Completed for Filing # 234310206
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: SERVICE OF COURT DOCUMENT CASE NUMBER 062024CA000203AXXXCE Kenyotta Pace Plaintiff vs.VILLAGE AT WOODLAND LAKE HOMEOWNERS ASSOCATION, IN, et al Defendant
+  Email age: 0 days
+  Case Number from subject: 062024CA000203AXXXCE
+  WARNING: Case number 062024CA000203AXXXCE not found in Lookup Table 2
+  No Excel mapping found, searching all folders for case 062024CA000203AXXXCE
+  Found case folder: Unknown\062024CA000203AXXXCE - Kenyotta Pace Plaintiff vs.VILLAGE AT WOODLAND LAKE HOMEOWNERS ASSOCATION
+  Found case: Unknown - 062024CA000203AXXXCE - Kenyotta Pace Plaintiff vs.VILLAGE AT WOODLAND LAKE HOMEOWNERS ASSOCATION
+  Found 2 PDF link(s) in email body
+  Checking for direct PDF attachments...
+  Processing 1 PDF(s) total
+
+  Processing: Order
+  URL: https://www.myflcourtaccess.com/nefdocuments/document.nefdd?nai=UmzJ7m2T9NpBvVMCcefmeMAXc0OBgRHj&ds=1
+  Downloaded (138175 bytes)
+  Document type: Order -> 09 Orders
+  Filing level: unknown -> Unknown\Order
+  E-Filing date: 2025.10.24
+  Uploading to: Unknown\Order\2025.10.24 - Order.pdf
+  Saved to: C:\Users\zucku\OneDrive - Vernis and Bowling\Litigation Operations - Cases\Unknown\Order\2025.10.24 - Order.pdf
+  Filed successfully
+
+Processing email: RE: LANDAY, LARRY - WARRIOR ROOFING MANUFACTURING CO INC, ET AL.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Processing Completed for Filing # 234400231
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Filing Received
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Re: LANDAY, LARRY - WARRIOR ROOFING MANUFACTURING CO INC, ET AL.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE:  Objection to Unilaterally Scheduled Deposition – Hernandez v. Citizens Property Insurance Corporation
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Hernandez
+  Found 2 matching cases - ambiguous, leaving uncategorized
+  Searching for existing case with party name: Citizens Property Insurance Corporation
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: RIZZI v Warrior / ABC / SCE - Deposition coordination
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: RIZZI
+  Found matching case: 255\240324 - Rizzi
+  Found case: 255 - 240324 - Rizzi
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: (BODILY INJURY) - BERHMANN, RYAN VS STURLA, MARIO, ARIANNY AND MARITZA - EDI969308 - KG FILE NO: 25-4523
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: FW: Our File no. 220-90250094 Navarro Macavinta, Rafael v. Midiri, Philomenia (2024-794845) Claim no.
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: Harbour Pointe Condominium Association Inc vs. Citizens - Deposition Request
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Harbour Pointe Condominium Association Inc
+  No matching cases found
+  Searching for existing case with party name: Citizens
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: Our File no. 220-90250094 Navarro Macavinta, Rafael v. Midiri, Philomenia (2024-794845) Claim no.: Macavinta v. Midri
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Macavinta
+  Found matching case: 220\90250094 - Macavinta
+  Found case: 220 - 90250094 - Macavinta
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Processing Completed for Filing # 234344923
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: RE: Ungaro, Natalie v. Rooney  / NJM Claim 2023-632391
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Natalie
+  No matching cases found
+  Searching for existing case with party name: Rooney
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+Processing email: Re: Harbour Pointe Condominium Association Inc vs. Citizens - Deposition Request
+  Email age: 0 days
+  No case number in subject - will try party name matching
+  Searching for existing case with party name: Harbour Pointe Condominium Association Inc
+  No matching cases found
+  Searching for existing case with party name: Citizens
+  No matching cases found
+  No case info yet - will extract from PDF captions
+  Checking for direct PDF attachments...
+  WARNING: No PDFs found (no links or attachments)
+
+============================================================
+Completed: 2/45 emails processed successfully
+============================================================

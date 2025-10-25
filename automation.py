@@ -52,24 +52,6 @@ class Config:
         self.CASES_FOLDER = os.getenv("CASES_FOLDER") or config_data.get("cases_folder") or self.CASES_FOLDER
         self.TRIAL_TRACKER_EXCEL = os.getenv("TRIAL_TRACKER_EXCEL") or config_data.get("trial_tracker_excel") or self.TRIAL_TRACKER_EXCEL
 
-        # AI Provider Selection (env takes priority, then config, then default)
-        self.AI_PROVIDER = os.getenv("AI_PROVIDER") or config_data.get("ai_provider", "claude")
-
-        # Claude API
-        self.ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or config_data.get("anthropic_key", "")
-
-        # OpenAI API
-        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or config_data.get("openai_key", "")
-        self.OPENAI_MODEL = os.getenv("OPENAI_MODEL") or config_data.get("openai_model", "gpt-4o")
-
-        # Google Gemini API
-        self.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or config_data.get("gemini_key", "")
-        self.GEMINI_MODEL = os.getenv("GEMINI_MODEL") or config_data.get("gemini_model", "gemini-2.5-pro")
-
-        # vLLM (self-hosted)
-        self.VLLM_BASE_URL = os.getenv("VLLM_BASE_URL") or config_data.get("vllm_url", "http://localhost:8000/v1")
-        self.VLLM_MODEL = os.getenv("VLLM_MODEL") or config_data.get("vllm_model", "Qwen/Qwen2-VL-72B-Instruct")
-
         # Test mode (skips PDF validation for testing)
         self.TEST_MODE = os.getenv("TEST_MODE", "").lower() == "true" or config_data.get("test_mode", False)
         self.TEST_PDF_PATH = os.getenv("TEST_PDF_PATH") or config_data.get("test_pdf_path")
@@ -509,39 +491,10 @@ class SharePointClient:
 
 
 class PDFProcessor:
-    """Process PDFs using various AI providers"""
+    """Process PDFs using regex-based extraction"""
 
     def __init__(self, config: Config):
         self.config = config
-        self.provider = config.AI_PROVIDER.lower()
-
-        # Initialize provider-specific clients
-        try:
-            if self.provider == "claude":
-                import anthropic
-                self.client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
-            elif self.provider == "openai":
-                import openai
-                self.client = openai.OpenAI(api_key=config.OPENAI_API_KEY)
-            elif self.provider == "gemini":
-                import google.generativeai as genai
-                # Configure without proxy settings
-                import os
-                if 'HTTP_PROXY' in os.environ:
-                    del os.environ['HTTP_PROXY']
-                if 'HTTPS_PROXY' in os.environ:
-                    del os.environ['HTTPS_PROXY']
-                genai.configure(api_key=config.GEMINI_API_KEY)
-                self.client = genai.GenerativeModel(config.GEMINI_MODEL)
-            elif self.provider == "vllm":
-                import openai
-                # vLLM uses OpenAI-compatible API
-                self.client = openai.OpenAI(
-                    base_url=config.VLLM_BASE_URL,
-                    api_key="EMPTY"  # vLLM doesn't require API key
-                )
-        except Exception as e:
-            raise Exception(f"Failed to initialize {self.provider} AI client: {e}\n\nTry updating the library:\npip install --upgrade google-generativeai")
 
     def _extract_with_regex(self, pdf_content: bytes) -> Dict[str, Optional[str]]:
         """Extract trial dates using regex patterns (fast, free, offline)"""
@@ -668,191 +621,21 @@ class PDFProcessor:
             return None
 
     def extract_trial_dates(self, pdf_content: bytes) -> Dict[str, Optional[str]]:
-        """Extract trial-related dates from PDF - tries regex first, falls back to AI"""
-
-        # Try regex first (fast, free, offline)
+        """Extract trial-related dates from PDF using regex"""
         print(f"  Attempting regex extraction...")
-        regex_result = self._extract_with_regex(pdf_content)
+        result = self._extract_with_regex(pdf_content)
 
-        if regex_result:
-            print(f"  SUCCESS: Using regex extraction (no AI needed)")
-            return regex_result
-
-        # Fall back to AI if regex didn't work
-        print(f"  Regex failed, falling back to {self.provider.upper()} AI...")
-
-        if self.provider == "claude":
-            return self._extract_with_claude(pdf_content)
-        elif self.provider == "openai":
-            return self._extract_with_openai(pdf_content)
-        elif self.provider == "gemini":
-            return self._extract_with_gemini(pdf_content)
-        elif self.provider == "vllm":
-            return self._extract_with_vllm(pdf_content)
+        if result:
+            print(f"  Regex extraction successful")
+            return result
         else:
-            raise ValueError(f"Unsupported AI provider: {self.provider}")
-
-    def _get_extraction_prompt(self) -> str:
-        """Get the prompt for date extraction"""
-        return """Analyze this court document PDF and extract the following dates if present:
-
-1. Calendar Call date (also called "Calendar Call" or "Pretrial Conference")
-2. Trial Start date (also called "Trial Period Begins" or "Trial Date")
-3. Trial End date (also called "Trial Period Ends")
-
-Return the information in this exact JSON format:
-{
-  "calendar_call": "YYYY-MM-DD or null",
-  "trial_start": "YYYY-MM-DD or null",
-  "trial_end": "YYYY-MM-DD or null",
-  "document_type": "CMO or UTO or Other"
-}
-
-If a date is not found, use null. Ensure dates are in YYYY-MM-DD format.
-If this is a Case Management Order, set document_type to "CMO".
-If this is a Uniform Trial Order, set document_type to "UTO".
-"""
-
-    def _extract_json_from_response(self, text: str) -> Dict:
-        """Extract JSON from AI response"""
-        json_match = re.search(r'\{[^}]+\}', text, re.DOTALL)
-        if json_match:
-            return json.loads(json_match.group())
-        return {
-            "calendar_call": None,
-            "trial_start": None,
-            "trial_end": None,
-            "document_type": "Other"
-        }
-
-    def _extract_with_claude(self, pdf_content: bytes) -> Dict:
-        """Extract dates using Claude"""
-        try:
-            pdf_base64 = base64.standard_b64encode(pdf_content).decode("utf-8")
-
-            message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
-                max_tokens=1024,
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "document",
-                            "source": {
-                                "type": "base64",
-                                "media_type": "application/pdf",
-                                "data": pdf_base64,
-                            },
-                        },
-                        {"type": "text", "text": self._get_extraction_prompt()}
-                    ],
-                }],
-            )
-
-            response_text = message.content[0].text
-            return self._extract_json_from_response(response_text)
-
-        except Exception as e:
-            print(f"Error with Claude: {e}")
-            return self._get_empty_result()
-
-    def _extract_with_openai(self, pdf_content: bytes) -> Dict:
-        """Extract dates using OpenAI GPT-4o (Vision)"""
-        try:
-            pdf_base64 = base64.standard_b64encode(pdf_content).decode("utf-8")
-
-            response = self.client.chat.completions.create(
-                model=self.config.OPENAI_MODEL,
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": self._get_extraction_prompt()
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:application/pdf;base64,{pdf_base64}"
-                            }
-                        }
-                    ]
-                }],
-                max_tokens=1024
-            )
-
-            response_text = response.choices[0].message.content
-            return self._extract_json_from_response(response_text)
-
-        except Exception as e:
-            print(f"Error with OpenAI: {e}")
-            return self._get_empty_result()
-
-    def _extract_with_gemini(self, pdf_content: bytes) -> Dict:
-        """Extract dates using Google Gemini"""
-        try:
-            import google.generativeai as genai
-
-            # Upload PDF to Gemini
-            file_obj = genai.upload_file(
-                path=None,
-                mime_type="application/pdf",
-                data=pdf_content
-            )
-
-            response = self.client.generate_content([
-                file_obj,
-                self._get_extraction_prompt()
-            ])
-
-            response_text = response.text
-            return self._extract_json_from_response(response_text)
-
-        except Exception as e:
-            print(f"Error with Gemini: {e}")
-            return self._get_empty_result()
-
-    def _extract_with_vllm(self, pdf_content: bytes) -> Dict:
-        """Extract dates using vLLM (self-hosted)"""
-        try:
-            # vLLM with vision models (like Qwen2-VL) uses OpenAI-compatible API
-            pdf_base64 = base64.standard_b64encode(pdf_content).decode("utf-8")
-
-            response = self.client.chat.completions.create(
-                model=self.config.VLLM_MODEL,
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": self._get_extraction_prompt()
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:application/pdf;base64,{pdf_base64}"
-                            }
-                        }
-                    ]
-                }],
-                max_tokens=1024
-            )
-
-            response_text = response.choices[0].message.content
-            return self._extract_json_from_response(response_text)
-
-        except Exception as e:
-            print(f"Error with vLLM: {e}")
-            return self._get_empty_result()
-
-    def _get_empty_result(self) -> Dict:
-        """Return empty result on error"""
-        return {
-            "calendar_call": None,
-            "trial_start": None,
-            "trial_end": None,
-            "document_type": "Other"
-        }
+            print(f"  Regex extraction failed - no dates found")
+            return {
+                "calendar_call": None,
+                "trial_start": None,
+                "trial_end": None,
+                "document_type": "Other"
+            }
 
 
 class TrialOrdersAutomation:
@@ -1393,20 +1176,29 @@ class TrialOrdersAutomation:
         if case_number:
             case_info = self.sharepoint_client.get_case_by_number(case_number)
 
-        # If no case info yet, try matching by party names in subject
+        # If no case info yet, try matching by party names or claim number in subject
         if not case_info:
-            # Extract party names from subject (format: "PARTY1 v PARTY2" or "PARTY1 vs PARTY2")
-            party_match = re.search(r'([A-Z][A-Za-z\s]+?)\s+(?:v\.?s?\.?)\s+([A-Z][A-Za-z\s/]+?)(?:\s+-|\s+/|$)', subject, re.IGNORECASE)
-            if party_match:
-                plaintiff = party_match.group(1).strip()
-                defendant = party_match.group(2).strip()
+            # Try claim number first (format: "2023-632391" or "09678902")
+            claim_match = re.search(r'(?:claim|file)[\s#:]+([0-9-]+)', subject, re.IGNORECASE)
+            if claim_match:
+                claim_num = claim_match.group(1).strip()
+                case_info = self.sharepoint_client.get_case_by_number(claim_num)
 
-                # Try to find case by plaintiff name first
-                case_info = self.find_case_by_party_name(plaintiff)
+            # If not found by claim, try party names
+            if not case_info:
+                # Extract party names (format: "LAST, FIRST v PARTY2")
+                # Handle "LAST, FIRST" format to extract just last name
+                party_match = re.search(r'([A-Z][A-Za-z]+)(?:,\s*[A-Z][A-Za-z\s]+?)?\s+(?:v\.?s?\.?)\s+([A-Z][A-Za-z\s/]+?)(?:\s+-|\s+/|$)', subject, re.IGNORECASE)
+                if party_match:
+                    plaintiff_last = party_match.group(1).strip()  # Just the last name
+                    defendant = party_match.group(2).strip()
 
-                # If not found, try defendant
-                if not case_info:
-                    case_info = self.find_case_by_party_name(defendant)
+                    # Try to find case by plaintiff last name first
+                    case_info = self.find_case_by_party_name(plaintiff_last)
+
+                    # If not found, try defendant
+                    if not case_info:
+                        case_info = self.find_case_by_party_name(defendant)
 
         # If still no case info and we have a case number, try to create new row
         if not case_info and case_number:
@@ -1571,7 +1363,7 @@ class TrialOrdersAutomation:
     def run(self):
         """Main run loop"""
         print("=" * 60)
-        print(f"Court Document Automation - Starting (AI: {self.config.AI_PROVIDER.upper()})")
+        print(f"Court Document Automation - Starting")
         print("  - Trial Orders (UTO/CMO): Extract dates + Update Excel")
         print("  - Other Documents: Auto-route to appropriate folders")
         print("=" * 60)
