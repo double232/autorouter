@@ -56,6 +56,10 @@ class Config:
         self.TEST_MODE = os.getenv("TEST_MODE", "").lower() == "true" or config_data.get("test_mode", False)
         self.TEST_PDF_PATH = os.getenv("TEST_PDF_PATH") or config_data.get("test_pdf_path")
 
+        # Defendant to Client mapping (from config)
+        self.DEFENDANT_CLIENT_MAP = config_data.get("defendant_client_map", {})
+        self.DEFAULT_CLIENT = config_data.get("default_client", "4694")
+
 
 class EmailClient:
     """Outlook COM email client - uses your existing Outlook installation"""
@@ -173,6 +177,12 @@ class SharePointClient:
         self.cases_folder = Path(config.CASES_FOLDER)
         self.trial_tracker_excel = Path(config.TRIAL_TRACKER_EXCEL)
 
+        # Excel and folder caches - loaded on first use
+        self._excel_cache_loaded = False
+        self._case_index = {}  # {case_number: {client, matter, style}}
+        self._party_index = {}  # {party_word: [case_info, ...]}
+        self._folder_index = {}  # {client/matter: case_info}
+
         # Verify folders exist
         if not self.cases_folder.exists():
             raise Exception(f"Cases folder not found: {self.cases_folder}")
@@ -181,8 +191,94 @@ class SharePointClient:
         print(f"   Cases: {self.cases_folder}")
         print(f"   Tracker: {self.trial_tracker_excel}")
 
+    def _ensure_caches_loaded(self):
+        """Load Excel and folder caches on first use"""
+        if self._excel_cache_loaded:
+            return
+
+        print("Building case index from Excel and folders...")
+
+        # Load Excel index
+        try:
+            if self.trial_tracker_excel.exists():
+                wb = load_workbook(self.trial_tracker_excel, read_only=True, data_only=True)
+                if "Lookup Table 2" in wb.sheetnames:
+                    ws = wb["Lookup Table 2"]
+                    headers = [cell.value for cell in ws[1]]
+
+                    if "Case No." in headers and "Client" in headers and "Matter" in headers:
+                        case_no_idx = headers.index("Case No.")
+                        client_idx = headers.index("Client")
+                        matter_idx = headers.index("Matter")
+                        style_idx = headers.index("Style") if "Style" in headers else None
+
+                        for row in ws.iter_rows(min_row=2, values_only=True):
+                            case_no = str(row[case_no_idx]).strip() if row[case_no_idx] else None
+                            client = str(row[client_idx]) if row[client_idx] else None
+                            matter = str(row[matter_idx]) if row[matter_idx] else None
+                            style = str(row[style_idx]) if style_idx and row[style_idx] else "Unknown"
+
+                            if case_no and client:
+                                self._case_index[case_no] = {
+                                    "Client": client,
+                                    "Matter": matter or case_no,
+                                    "Style": style
+                                }
+        except Exception as e:
+            print(f"  Error loading Excel: {e}")
+
+        # Build folder index and party index
+        try:
+            for client_folder in self.cases_folder.iterdir():
+                if not client_folder.is_dir():
+                    continue
+
+                for matter_folder in client_folder.iterdir():
+                    if not matter_folder.is_dir():
+                        continue
+
+                    client_num = client_folder.name
+                    matter_name = matter_folder.name
+                    style = matter_name.split(" - ", 1)[1] if " - " in matter_name else "Unknown"
+
+                    folder_key = f"{client_num}/{matter_name}"
+                    self._folder_index[folder_key] = {
+                        "Client": client_num,
+                        "Matter": matter_name,
+                        "Style": style,
+                        "FolderPath": str(matter_folder),
+                        "RelativePath": f"{client_num}\\{matter_name}"
+                    }
+
+                    # Index party names
+                    if style != "Unknown":
+                        for word in style.upper().split():
+                            if len(word) >= 3:
+                                if word not in self._party_index:
+                                    self._party_index[word] = []
+                                self._party_index[word].append(self._folder_index[folder_key])
+
+        except Exception as e:
+            print(f"  Error building folder index: {e}")
+
+        self._excel_cache_loaded = True
+        print(f"  Indexed {len(self._case_index)} Excel entries, {len(self._folder_index)} folders, {len(self._party_index)} party keys")
+
     def lookup_case_from_excel(self, case_number: str) -> Optional[Dict]:
-        """Look up client and matter from court case number in Lookup Table 2"""
+        """Look up client and matter from court case number in Lookup Table 2 (uses cache)"""
+        self._ensure_caches_loaded()
+
+        # Check cache first
+        if case_number in self._case_index:
+            case_data = self._case_index[case_number]
+            print(f"  Found Excel mapping: {case_number} -> Client {case_data['Client']}, Matter {case_data['Matter']}")
+            return case_data
+
+        print(f"  WARNING: Case number {case_number} not found in Lookup Table 2")
+        return None
+
+    def lookup_case_from_excel_OLD(self, case_number: str) -> Optional[Dict]:
+        """OLD: Look up client and matter - replaced by cached version"""
         try:
             if not self.trial_tracker_excel.exists():
                 print(f"  WARNING: Trial Tracker Excel not found")
@@ -752,38 +848,20 @@ class TrialOrdersAutomation:
             return None
 
     def identify_client_from_defendant(self, defendant_text: str) -> str:
-        """Identify client number from defendant name"""
+        """Identify client number from defendant name using config mappings"""
         defendant_upper = defendant_text.upper()
 
-        # Defendant to Client mapping
-        defendant_client_map = {
-            "CITIZENS": "272",
-            "CITIZENS PROPERTY": "272",
-            "CASTLE KEY INDEMNITY": "397",
-            "CASTLE KEY INSURANCE": "397",
-            "CASTLE KEY": "397",
-            "NEW JERSEY MANUFACTURERS": "220",
-            "SOUTHERN OAK": "325",
-            "TRAVELERS": "371",
-            "SEDANO": "808",
-            "CENTAURI SPECIALTY": "1567",
-            "CENTAURI": "1567",
-            "FIGA": "4002",
-            "FRESCO Y MAS": "5666",
-            # EAZ misc = 4694 (catch-all, checked last)
-        }
-
-        # Check for defendant matches (most specific first)
-        for defendant, client in defendant_client_map.items():
-            if defendant in defendant_upper:
+        # Use defendant mapping from config
+        for defendant, client in self.config.DEFENDANT_CLIENT_MAP.items():
+            if defendant.upper() in defendant_upper:
                 return client
 
-        # Return None if no match (caller will handle)
+        # Return None if no match (caller will handle with default)
         return None
 
     def identify_client_from_subject(self, subject: str) -> str:
         """Identify client number from defendant name in email subject"""
-        return self.identify_client_from_defendant(subject) or "4694"
+        return self.identify_client_from_defendant(subject) or self.config.DEFAULT_CLIENT
 
     def determine_filing_path(
         self,
@@ -898,17 +976,33 @@ class TrialOrdersAutomation:
                             tmp_zip_path = tmp.name
                             attachment.SaveAsFile(tmp_zip_path)
 
-                        # Extract PDFs from ZIP
+                        # Extract PDFs from ZIP with size limits
                         try:
-                            with zipfile.ZipFile(tmp_zip_path, 'r') as zip_ref:
-                                for zip_info in zip_ref.namelist():
-                                    if zip_info.lower().endswith('.pdf'):
-                                        pdf_content = zip_ref.read(zip_info)
-                                        # Use just the filename without path
-                                        pdf_name = os.path.basename(zip_info)
-                                        title = pdf_name[:-4] if pdf_name.lower().endswith('.pdf') else pdf_name
-                                        attachments.append((title, pdf_content))
-                                        print(f"      Extracted from ZIP: {pdf_name}")
+                            zip_size = os.path.getsize(tmp_zip_path)
+                            MAX_ZIP_SIZE = 100 * 1024 * 1024  # 100MB limit
+                            MAX_PDF_SIZE = 50 * 1024 * 1024   # 50MB per PDF
+
+                            if zip_size > MAX_ZIP_SIZE:
+                                print(f"      WARNING: ZIP too large ({zip_size / 1024 / 1024:.1f}MB > 100MB limit) - skipping")
+                            else:
+                                with zipfile.ZipFile(tmp_zip_path, 'r') as zip_ref:
+                                    for zip_info in zip_ref.namelist():
+                                        if zip_info.lower().endswith('.pdf'):
+                                            # Check PDF size before extracting
+                                            if zip_info.file_size > MAX_PDF_SIZE:
+                                                print(f"      Skipping large PDF: {zip_info.filename} ({zip_info.file_size / 1024 / 1024:.1f}MB)")
+                                                continue
+
+                                            # Sanitize filename to prevent path traversal
+                                            pdf_name = os.path.basename(zip_info.filename)
+                                            if not pdf_name or '..' in pdf_name:
+                                                print(f"      Skipping suspicious filename: {zip_info.filename}")
+                                                continue
+
+                                            pdf_content = zip_ref.read(zip_info)
+                                            title = pdf_name[:-4] if pdf_name.lower().endswith('.pdf') else pdf_name
+                                            attachments.append((title, pdf_content))
+                                            print(f"      Extracted from ZIP: {pdf_name}")
                         except Exception as e:
                             print(f"      Error extracting ZIP: {e}")
 
