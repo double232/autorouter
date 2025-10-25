@@ -1081,8 +1081,9 @@ class TrialOrdersAutomation:
         # Remove None values
         record_data = {k: v for k, v in record_data.items() if v is not None}
 
-        print(f"  Creating trial order record in SharePoint...")
-        self.sharepoint_client.create_trial_order_record(record_data)
+        # Excel updates disabled per user request
+        # print(f"  Creating trial order record in SharePoint...")
+        # self.sharepoint_client.create_trial_order_record(record_data)
 
         return {
             "file_url": file_url,
@@ -1326,19 +1327,20 @@ class TrialOrdersAutomation:
                 print(f"  Uploading to: {folder_path}\\{filename}")
                 file_url = self.sharepoint_client.upload_file(folder_path, filename, pdf_content)
 
-                # Process trial orders for date extraction and Excel updates
+                # Process trial orders for date extraction (Excel updates disabled)
                 if doc_type in ["UTO", "CMO"] and case_info:
                     extracted_data = self.pdf_processor.extract_trial_dates(pdf_content)
                     if any([extracted_data.get('calendar_call'), extracted_data.get('trial_start')]):
-                        record_data = {
-                            "Title": title,
-                            "Case_Number": doc_case_number,
-                            "Document_Type": doc_type,
-                            "Calendar_Call": extracted_data.get("calendar_call"),
-                            "Trial_Start": extracted_data.get("trial_start"),
-                            "Trial_End": extracted_data.get("trial_end"),
-                        }
-                        self.sharepoint_client.create_trial_order_record({k: v for k, v in record_data.items() if v})
+                        # Excel updates disabled per user request
+                        # record_data = {
+                        #     "Title": title,
+                        #     "Case_Number": doc_case_number,
+                        #     "Document_Type": doc_type,
+                        #     "Calendar_Call": extracted_data.get("calendar_call"),
+                        #     "Trial_Start": extracted_data.get("trial_start"),
+                        #     "Trial_End": extracted_data.get("trial_end"),
+                        # }
+                        # self.sharepoint_client.create_trial_order_record({k: v for k, v in record_data.items() if v})
                         print(f"  Trial dates extracted:")
                         print(f"     Calendar Call: {extracted_data.get('calendar_call', 'Not found')}")
                         print(f"     Trial Start: {extracted_data.get('trial_start', 'Not found')}")
